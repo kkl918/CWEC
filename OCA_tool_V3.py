@@ -207,5 +207,5 @@ make_video()
 oil_remain()
 # os.system("pause")
 
-cmd = "notepad.exe {}".format(result_path)
+cmd = ""C:\Program Files\Notepad++\notepad++.exe" {}".format(result_path)
 os.system(cmd)
