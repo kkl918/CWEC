@@ -27,6 +27,7 @@ SST       = 'SST.{}00'.format(day)
 UCURR     = 'UCURR.{}00'.format(day)
 VCURR     = 'VCURR.{}00'.format(day)
 WL        = 'WL.{}00'.format(day)
+TWrange   = '[0:1:119][0:1:0][440:1:920][280:1:600]'
 data_type = [SALT, SST, UCURR, VCURR, WL]
 
 # 指定下載的路徑
@@ -50,7 +51,7 @@ def getData_web(types):
 
 # 給類型自動開網頁下載
 def getData_wget(types, dst):
-    url  = 'https://oceanapi.cwb.gov.tw/opendap/OCM/{}/00/9999/{}.nc.nc4?{}%5B0:1:119%5D%5B0:1:0%5D%5B0:1:1160%5D%5B0:1:640%5D'.format(day, types, types.split('.')[0])
+    url  = 'https://oceanapi.cwb.gov.tw/opendap/OCM/{}/00/9999/{}.nc.nc4?{}[0:1:119][0:1:0][440:1:920][280:1:600]'.format(day, types, types.split('.')[0])
     # print('{} {} {} {} {} {}'.format("wget", "--no-proxy", "-q", url, '-O',dst))
 
     result = subprocess.run(["wget", "--no-proxy", "-q", url, '-O',dst], stdout=subprocess.PIPE, universal_newlines=True)
