@@ -125,16 +125,13 @@ def main():
     URL_status = requests.get('https://oceanapi.cwb.gov.tw/opendap/OCM/{}/contents.html'.format(today_str)).status_code
     # print(URL_status)
     if URL_status  == 200:
-        BatWrork()
+        print(URL_status)
     else:
         print('[ERROR] URL not exist, status:{}.'.format(URL_status))
 
-
-# BatDownload_nc(2)
 main()
-
-
-
+# BatDownload_nc(2)
+# BatWrork()
 
 
 

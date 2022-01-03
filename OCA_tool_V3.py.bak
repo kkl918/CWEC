@@ -6,7 +6,7 @@
 ## Note       : V3版                  ##
 ########################################
 
-import os, cv2, shutil, sys, re, matplotlib, subprocess
+import os, cv2, shutil, sys, re, matplotlib  
 from PIL import Image, ImageFont, ImageDraw 
 import matplotlib.pyplot as plt
 
@@ -189,7 +189,7 @@ def oil_remain():
     ax.plot(t_array, w_array, label='海水中', color = 'b'    , marker='>', linestyle='dashed')
     ax.plot(t_array, a_array, label='岸際'  , color = 'brown', marker='^', linestyle='dashed')
     ax.plot(t_array, e_array, label='揮發'  , color = 'c'    , marker='D', linestyle='dashed')
-    ax.set_ylabel(oil_unit, fontsize=18)
+    ax.set_ylabel('公噸', fontsize=18)
     ax.set_xlabel('時間(小時)', fontsize=18)
     # ax.legend(fancybox=True,bbox_to_anchor=(1, 1))
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=5, fancybox=True)
@@ -205,11 +205,7 @@ init()
 make_tag()
 make_video()
 oil_remain()
+# os.system("pause")
 
-
-
-subprocess.run([r'C:\Program Files\Notepad++\notepad++.exe', result_path], stdout=subprocess.PIPE, universal_newlines=True)
-# cmd = "{} {}".format(r'C:\Program Files\Notepad++\notepad++.exe', result_path)
-# os.system(cmd)
-
-os.system("pause")
+cmd = ""C:\Program Files\Notepad++\notepad++.exe" {}".format(result_path)
+os.system(cmd)
