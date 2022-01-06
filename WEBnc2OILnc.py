@@ -5,7 +5,7 @@ from pathlib import Path
 day  = '20211229'
 U    = r'/home1/cwecA/OPENDAP/{}/UCURR.{}00.nc.nc4'          .format(day, day)
 V    = r'/home1/cwecA/OPENDAP/{}/VCURR.{}00.nc.nc4'          .format(day, day)
-fn   = r'/home1/cwecA/OPENDAP/{}/temp{}.nc'                .format(day, day)
+fn   = r'/home1/cwecA/OPENDAP/{}/temp{}.nc'                  .format(day, day)
 dump = r'/home1/cwecA/OPENDAP/{}/dump.nc'                    .format(day, day)
 out  = r'/home1/cwecA/OPENDAP/{}/OCMweb{}.nc'                .format(day, day)
  
