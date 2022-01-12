@@ -40,6 +40,6 @@ def mergeBYday(day):
 for i in range(1,6):
     today     = datetime.datetime.today()
     nextday  = today + datetime.timedelta(days=1)
-    mergeBYday(nextday.strftime("%Y%m%d"))
+    print(nextday.strftime("%Y%m%d"))
     
 # ncdump /home1/cwecA/OPENDAP/20211229/OCNweb20211229.nc > /home1/cwecA/OPENDAP/20211229/nc.dump    

@@ -55,7 +55,6 @@ def getData_wget(types, dst):
     
     url  = 'https://oceanapi.cwb.gov.tw/opendap/OCM/{}/00/9999/{}.nc.nc4?{}{}'.format(day, types, types.split('.')[0], TWrange)
     url  = 'https://oceanapi.cwb.gov.tw/opendap/OCM/{}/00/9999/{}.nc.nc4?'.format(day, types)
-    print(dst)
     print('{} {} {} {} {} {}'.format("wget", "--no-proxy", "-q", url, '-O',dst))
 
     result = subprocess.run(["wget", "--no-proxy", "-q", url, '-O',dst], stdout=subprocess.PIPE, universal_newlines=True)
