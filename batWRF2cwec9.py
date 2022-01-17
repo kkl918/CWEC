@@ -22,6 +22,16 @@ def batWRF2cwec9():
             print('[{}]\nSRC : {}\nDST : {}\n\n'.format(nc.name, nc, Path(DST_path).joinpath(nc.name)))
             shutil.copy(nc, Path(DST_path).joinpath(nc.name))
 
+def remove_old_wind():
+    path            = r'O:\loc_data\Taiwan\WINDS'
+    tomon_str       = datetime.datetime.today().strftime("%Y%m")
+    tomon_minus1    = tomon_str[:4]
+    # print(tomon_minus1+str(int(tomon_minus1[4:])-1))
+    print(tomon_minus1+str(int(tomon_str[3:])-1))
+    WRF_folder_path = [Path(path).joinpath(i).name for i in os.listdir(path) if i.endswith('nc') and i[3:9]==tomon_str] 
+    # print(WRF_folder_path)
 
 batWRF2cwec9()
+# remove_old_wind()
 os.system('pause')
+

@@ -14,6 +14,9 @@ print('\n\n*********************************************************************
 
 today     = datetime.datetime.today()
 today_str = datetime.datetime.today().strftime("%Y%m%d")
+# TEST
+# today_str = '20220114'
+
 
 def init(DDD):
     global day                  
@@ -39,10 +42,9 @@ def init(DDD):
 
     correct_file_size = 74135850
 
+
     Path.mkdir(DL_path, parents=True, exist_ok=True)                               # 建資料夾
     
-
-
 
 def log_write(text):
     with open(DL_path.parents[0].joinpath('cron.log'), 'a') as f:
@@ -172,6 +174,7 @@ def BatWrork():
         line_msg('***ERROR***')
     
 def main():
+    init(today_str)
     URL = 'https://oceanapi.cwb.gov.tw/opendap/OCM/{}/contents.html'.format(day)
     URL_status = requests.get(URL).status_code
     
@@ -181,20 +184,20 @@ def main():
     else:
         print('[ERROR] URL not exist, status:{}.'.format(URL_status))
 
-
 def DEBUG_USE():
-    for i in range(1,12):
-        deltaday  = datetime.timedelta(days=-1)
+    for i in range(1,5):
+        today     = datetime.datetime.today()
+        init(today)
+        deltaday  = datetime.timedelta(days=-i)
         today     = today + deltaday
         today_str = today.strftime("%Y%m%d")
         day       = today_str
         print("date and time:",day)
         init(day)
-        # print(DL_data)
-        main()
-
+        print(DL_data)
+        # main()
 
 main()
-
+# DEBUG_USE()
 print('Script End.\n\n')
 
