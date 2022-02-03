@@ -83,7 +83,7 @@ def parse_KHurl():
     # print(wHADCP_status)
  
     if webHADCP_code + nHADCP_code + wHADCP_code == 3:
-        HADCP_stastus = '{}:高雄港海流測站正常。'.format(HADCP_time)
+        HADCP_stastus = '{}:高雄港海流測站正常(北站{}v,西站{}v)。'.format(HADCP_time, nHADCP_vol, wHADCP_vol)
 
         
     
@@ -325,16 +325,24 @@ def print_detail():
     print(MLN2_detail)
     print(MLN5_detail, '\n')
     print(HADCP_detil, '\n')
+    
+    return('\n* * * * * * * * * *\n{}\n{}\n{}\n'.format(MLN2_detail, MLN5_detail, HADCP_detil))
 
+
+def log(text):
+    with open(r'C:\Users\USER\Documents\LOG\auto_check.txt', 'a', encoding='utf8') as logs:
+        logs.write(text)
+    
 webHADCP_status = parse_KHurl()
 dbHADCP_status  = Bat_check_HADCP()
 ML_status       = Bat_ML_check()
 realtime_status = '{}\n\n{}'.format(ML_status, webHADCP_status)
 
+
+
 print(realtime_status)
+log(print_detail())
 # print(dbHADCP_status)
-
-
 line_msg(realtime_status)
 
 
