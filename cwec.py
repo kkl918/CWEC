@@ -1,14 +1,14 @@
-########################################
-## Created on : 2021/12/21            ##
-## Author     : 林佳慶(Chia-Ching Lin)##
-## Target     : OILMAP後製圖片及影片  ##
-## E-mail     : kakinglin@gail.com    ##
-## Note       : V3版                  ##
-########################################
 
-import os, cv2, shutil, sys, re, matplotlib, subprocess
-from PIL import Image, ImageFont, ImageDraw 
-import matplotlib.pyplot as plt
+
+
+class CWEC:
+
+
+def tool():
+    import os, cv2, shutil, sys, re, matplotlib, subprocess
+    from PIL import Image, ImageFont, ImageDraw 
+    import matplotlib.pyplot as plt
+    from pathlib import Path
 
 
 
@@ -30,22 +30,31 @@ def init():
 
     # print(__file__)
     par_path = os.path.dirname(__file__)
-    print(par_path)
+    p = [i.name for i in Path(par_path).parents]
+    
+    
+    
 
-
+    Fates         = "O:\loc_data\Taiwan\FATES"
+    TXT_par       = Path(Fates)
     RAW_path      = par_path
 
     TAG_path      = os.path.join(par_path, 'TAGED')
-    TXT_path      = os.path.join(par_path, 'TIME_OIL.txt')
     JPG_path      = os.path.join(par_path, 'TIME_OIL.png')
     result_path   = os.path.join(par_path, 'result.txt')
-       
     case_name     = par_path.split('\\')[-1]
+    
     oil_season    = case_name.split('_')[-1]
     oil_unit      = case_name.split('_')[-2]
     oil_amount    = case_name.split('_')[-3]
     oil_type      = case_name.split('_')[-4]
 
+    # TXT_path      = os.path.join(Fates   , '{}-{}-{}-{}.txt'.format())
+    TXT_name      = '{}-{}-{}.txt'.format(p[3],p[2],p[1])
+    TXT_path      = TXT_par.joinpath(TXT_name)
+    if not TXT_path.exists():
+        print('[ERROR] File not exist : ' + str(TXT_path))
+    
     if not os.path.isdir(TAG_path):
         os.mkdir(TAG_path)
         
@@ -95,10 +104,6 @@ def make_tag():
         taged_path.append(done)
         work_img.save(done)
 
-
-
-
-
 def make_video():
     video_path  = os.path.join(par_path, case_name+'.wmv')
     img_array = []
@@ -120,16 +125,17 @@ def make_video():
         out.write(img_array[i])
     out.release()
 
-# Time(hours) Surface WaterColumn Ashore Evaporated Stranded
-t_array = []
-s_array = []
-w_array = []
-a_array = []
-e_array = []
-
-time_stamp = 0
 
 def oil_remain():
+    # Time(hours) Surface WaterColumn Ashore Evaporated Stranded
+    t_array = []
+    s_array = []
+    w_array = []
+    a_array = []
+    e_array = []
+
+    time_stamp = 0
+    
     # test only
     # path     = r'C:\Users\kk\Downloads\110OCA-LIDIA-1208-125.txt'
     # JPG_path = r'C:\Users\kk\Downloads\test.png'
@@ -201,15 +207,19 @@ def oil_remain():
    
     fig.savefig(JPG_path,bbox_inches='tight')    
     # print(s_array)
-init()
-make_tag()
-make_video()
-oil_remain()
+
+def open_txt():
+    subprocess.run([r'C:\Program Files\Notepad++\notepad++.exe', result_path], stdout=subprocess.PIPE, universal_newlines=True)
+
+def main():
+    init()
+    make_tag()
+    make_video()
+    oil_remain()
+    open_txt()
+    # os.system("pause")
 
 
 
-subprocess.run([r'C:\Program Files\Notepad++\notepad++.exe', result_path], stdout=subprocess.PIPE, universal_newlines=True)
-# cmd = "{} {}".format(r'C:\Program Files\Notepad++\notepad++.exe', result_path)
-# os.system(cmd)
 
-os.system("pause")
+    
