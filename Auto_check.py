@@ -1,4 +1,4 @@
-import os, requests, datetime, requests, re
+import os, requests, datetime, requests, re, sys
 from pathlib import Path
 from bs4 import BeautifulSoup
 
@@ -8,13 +8,15 @@ MLN2_vol_txt = Path(r'\\203.64.168.116\raw_data\107ML_RTAWAC\MLN2_AWAC\adam-MLN2
 MLN5_dat_txt = Path(r'\\203.64.168.116\raw_data\107ML_RTAWAC\MLN5_AWAC\N5_WAVE-RTMC.txt')
 MLN5_vol_txt = Path(r'\\203.64.168.116\raw_data\107ML_RTAWAC\MLN5_AWAC\adam-MLN5_V.TXT')
 
+ML_URL       = 'http://203.64.168.5/index.htm' 
+# ML_URL       = 'https://www.google.com.tw' 
+
 HADCP_C1_txt = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-C1\2201_HADCP_KH-C1_SD.txt'
 HADCP_C2_txt = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-C2\2201_HADCP_KH-C2_SD.txt'
 KH_NS_txt    = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-NS\2201_HADCP_KH-NS_SD.txt'
 KH_NW_txt    = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-NW\2201_HADCP_KH-NW_SD.txt'
 KH_WH_txt    = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-W\2201_HADCP_KH-W_SD.txt'
 KH_array     = [HADCP_C1_txt, HADCP_C2_txt, KH_NS_txt, KH_NW_txt, KH_WH_txt]
-
 
 # DEBUG
 # MLN2_dat_txt = Path(r'C:\Users\USER\Desktop\N2_WAVE-RTMC.txt')
@@ -23,12 +25,73 @@ KH_array     = [HADCP_C1_txt, HADCP_C2_txt, KH_NS_txt, KH_NW_txt, KH_WH_txt]
 # MLN5_dat_txt = Path(r'C:\Users\USER\Desktop\N5_WAVE-RTMC.txt')
 # MLN5_vol_txt = Path(r'C:\Users\USER\Desktop\adam-MLN5_V.TXT')
 
-def parse_KHurl():
+def parse_KHurl_station():
     url   = 'http://cwec.twport.com.tw/index.php'
     res   = requests.get(url)
     soup  = BeautifulSoup(res.text, 'html.parser')
-    
-    
+
+
+    content_array = [i for i in soup.text.split('\n') if i != '']
+
+    ne = [[i, j] for i, j in enumerate(content_array) if j == '北堤東面']
+    ns = [[i, j] for i, j in enumerate(content_array) if j == '北堤南面']
+    ww = [[i, j] for i, j in enumerate(content_array) if j == '西堤']
+
+    ne_status = [content_array[ne[0][0]+0], content_array[ne[0][0]+1].replace(' ',''), content_array[ne[0][0]+4].replace(' ','')]
+    ns_status = [content_array[ns[0][0]+0], content_array[ns[0][0]+1].replace(' ',''), content_array[ns[0][0]+4].replace(' ','')]
+    ww_status = [content_array[ww[0][0]+0], content_array[ww[0][0]+1].replace(' ',''), content_array[ww[0][0]+4].replace(' ','')]
+
+    ne_time_list = [ int(i) for i in ne_status[1].split('-') + ne_status[2].split(':')]
+    ns_time_list = [ int(i) for i in ns_status[1].split('-') + ns_status[2].split(':')]
+    ww_time_list = [ int(i) for i in ww_status[1].split('-') + ww_status[2].split(':')]
+
+    # print(ne_status, ne_status[1].split('-')+ ne_status[2].split(':'))
+    # print(ns_status, ns_status[1].split('-')+ ns_status[2].split(':'))
+    # print(ww_status, ww_status[1].split('-')+ ww_status[2].split(':'))
+
+
+    ne_time  = datetime.datetime(ne_time_list[0], ne_time_list[1], ne_time_list[2], ne_time_list[3])
+    ns_time  = datetime.datetime(ns_time_list[0], ns_time_list[1], ns_time_list[2], ns_time_list[3])
+    ww_time  = datetime.datetime(ww_time_list[0], ww_time_list[1], ww_time_list[2], ww_time_list[3])
+
+    ne_delta = (datetime.datetime.now()-ne_time).total_seconds()/3600
+    ns_delta = (datetime.datetime.now()-ns_time).total_seconds()/3600
+    ww_delta = (datetime.datetime.now()-ww_time).total_seconds()/3600
+
+    ne_status.append(str(ne_delta)[:4])
+    ns_status.append(str(ns_delta)[:4])
+    ww_status.append(str(ww_delta)[:4])
+
+    if float(ne_status[3]) < 12:
+        # print('[OK] {}回傳正常({},{})'.format(ne_status[0], ne_status[1], ne_status[2]))
+        ne_ = '{}資料回傳正常({},{})'.format(ne_status[0], ne_status[1], ne_status[2])
+    else:
+        # print('[ERROR] {}回傳異常({},{})'.format(ne_status[0], ne_status[1], ne_status[2]))
+        ne_ = '{}資料回傳異常({},{})'.format(ne_status[0], ne_status[1], ne_status[2])
+        
+    if float(ns_status[3]) < 12:
+        # print('[OK] {}回傳正常({},{})'.format(ns_status[0], ns_status[1], ns_status[2]))
+        ns_ = '{}資料回傳正常({},{})'.format(ns_status[0], ns_status[1], ns_status[2])
+    else:
+        # print('[ERROR] {}回傳異常({},{})'.format(ns_status[0], ns_status[1], ns_status[2]))
+        ns_ = '{}資料回傳異常({},{})'.format(ns_status[0], ns_status[1], ns_status[2])
+
+    if float(ww_status[3]) < 12:
+        # print('[OK] {}回傳正常({},{})'.format(ww_status[0], ww_status[1], ww_status[2]))
+        ww_ = '{}資料回傳正常({},{})'.format(ww_status[0], ww_status[1], ww_status[2])
+    else:
+        # print('[ERROR] {}回傳異常({},{})'.format(ww_status[0], ww_status[1], ww_status[2]))
+        ww_ = '{}資料回傳異常({},{})'.format(ww_status[0], ww_status[1], ww_status[2])
+
+    return('\n\n{}\n\n{}\n\n{}\n\n'.format(ne_, ns_, ww_))
+
+
+def parse_KHurl():
+    # 這裡處理電壓供應模組
+    url   = 'http://cwec.twport.com.tw/index.php'
+    res   = requests.get(url)
+    soup  = BeautifulSoup(res.text, 'html.parser')
+      
     re1              = re.compile(r'電壓').search(soup.text)
     
     date             = soup.text[re1.span()[1]+1:re1.span()[1]+17].replace('\t', '').replace(' ', '')[0:10]
@@ -37,10 +100,10 @@ def parse_KHurl():
     target           = soup.text[re1.span()[0]:re1.span()[1]+42].replace('\t', '').replace(' ', '').replace('xa0', '')
     
     wHADCP_name      = (''.join(target.split('\n')[0].split())[:6])
-    wHADCP_vol       =(''.join(target.split('\n')[0].split())[6:10])
+    wHADCP_vol       = (''.join(target.split('\n')[0].split())[6:10])
     
     nHADCP_name      = (''.join(target.split('\n')[1].split())[:6])
-    nHADCP_vol       =(''.join(target.split('\n')[1].split())[6:10])
+    nHADCP_vol       = (''.join(target.split('\n')[1].split())[6:10])
     y                = int(date.split('-')[0])
     m                = int(date.split('-')[1])
     d                = int(date.split('-')[2])
@@ -49,10 +112,10 @@ def parse_KHurl():
     mins             = int(time.split(':')[1])
     HADCP_time       = datetime.datetime(y, m, d, hr, mins)   
     HADCP_time_delta = (datetime.datetime.now()-HADCP_time).total_seconds()/3600
-    
+
     if HADCP_time_delta < 12:
         webHADCP_code     = 1
-        webHADCP_status   = '高雄港網頁資料傳輸正常，最後更新時間({})'.format(HADCP_time)
+        webHADCP_status   = '高雄港網頁資料傳輸正常'
         if float(wHADCP_vol) < 11.5:
             wHADCP_code   = -1
             wHADCP_status = '{}電壓異常({})'.format(nHADCP_name, wHADCP_vol)
@@ -69,13 +132,19 @@ def parse_KHurl():
             nHADCP_status = '{}電壓正常({})'.format(nHADCP_name, nHADCP_vol)
             
     else:
-        webHADCP_code     = -1
-        webHADCP_status   = '高雄港網頁資料傳輸異常，最後更新時間({})'.format(HADCP_time)
+        nHADCP_code       = -1
+        nHADCP_status     = '{}最後一次回傳電壓({})'.format(nHADCP_name, nHADCP_vol)
         
-    HADCP_stastus         = '{}\n{}\n{}\n{}\n'.format(HADCP_time, webHADCP_status, nHADCP_status, wHADCP_status)
+        wHADCP_code       = -1
+        wHADCP_status     = '{}最後一次回傳電壓({})'.format(wHADCP_name, wHADCP_vol)
+         
+        webHADCP_code     = -1
+        webHADCP_status   = '[***高雄港網頁電壓回傳異常***]，目前超過12小時未回傳'
+        
+    HADCP_stastus         = '\n\n網頁最後更新時間:{}\n\n{}\n\n{}\n\n{}\n\n{}\n'.format(HADCP_time, webHADCP_status, nHADCP_status, wHADCP_status, 'http://cwec.twport.com.tw/')
     
     global HADCP_detil
-    HADCP_detil           = '{}\n{}\n{}\n{}\n'.format(HADCP_time, webHADCP_status, nHADCP_status, wHADCP_status)
+    HADCP_detil           = '{}\n\n{}\n\n{}\n\n{}\n'.format(HADCP_time, webHADCP_status, nHADCP_status, wHADCP_status)
     
     # print(HADCP_time)
     # print(webHADCP_status)
@@ -83,12 +152,10 @@ def parse_KHurl():
     # print(wHADCP_status)
  
     if webHADCP_code + nHADCP_code + wHADCP_code == 3:
-        HADCP_stastus = '{}:高雄港海流測站正常(北站{}v,西站{}v)。'.format(HADCP_time, nHADCP_vol, wHADCP_vol)
-
-        
-    
+        HADCP_stastus = '電壓供應模組:正常({})\n\n北站電壓{}v,西站電壓{}v。'.format(HADCP_time, nHADCP_vol, wHADCP_vol)
     # print( HADCP_stastus)
-    HADCP_stastus = '高雄港海流測站:\n{}'.format(HADCP_stastus)
+    
+    HADCP_stastus = '高雄港海流測站:\n\n{}{}'.format(HADCP_stastus, parse_KHurl_station())
     return(HADCP_stastus)
 
 def parse_KH_txt(txt):
@@ -124,15 +191,24 @@ def parse_ML_txt(dat_txt, vol_txt):
         dat_array = f.readlines()[-50:-1]
         
     vol_time  = [i.replace(',',' ').replace('\n', '').split(' ')      for i in vol_array]
-    dat_time  = [[j.split(' ')[1].replace(',', '') ,j.split(' ')[5].replace(',', ''),  j.split(' ')[7].replace(',', '')] for j in dat_array]
+    dat_time  = [[j.split(' ')[0].replace(',', '') , j.split(' ')[1].replace(',', '') , j.split(' ')[5].replace(',', ''),  j.split(' ')[7].replace(',', '')] for j in dat_array]
     mat_time  = [i for i in vol_time if i in dat_time]
 
     out_array = []
     for i in vol_time:
             for j in dat_time:
-                if i[1] == j[0]:
-                    out_array.append('{},{},{},{},{}'.format(i[0], i[1], i[2][:4], j[1], j[2]))
-    return(out_array[-1])
+                
+                if i[0] == j[0] and i[1] == j[1]:
+                    out_array.append('{},{},{},{},{}'.format(i[0], i[1], i[2][:4], j[2], j[3]))
+    # print(dat_time[-1])
+    if len(out_array) == 0:
+        # return('2000-01-01,00:00:00,-1,-1,-1')
+        error_out = '{},{},{},{},{}'.format(dat_time[-1][0], dat_time[-1][1], vol_time[2][:4][2], dat_time[-1][2], dat_time[-1][3])
+
+        return(error_out)
+        
+    else:
+        return(out_array[-1])
 
 def line_msg(text): 
     url     = "https://notify-api.line.me/api/notify"
@@ -174,8 +250,9 @@ def chech_HADCP(txt):
         HADCP_status = '{} {} 資料傳輸異常，回傳數值為空'.format(data[0], name)
         return(HADCP_status)
     
-def check_MLN2_data(MLN2_dat_txt, MLN2_vol_txt):
-    MLN2 = parse_ML_txt(MLN2_dat_txt, MLN2_vol_txt)   
+def check_MLN2_data(MLN2_dat_txt, MLN2_vol_txt, name):
+    MLN2      = parse_ML_txt(MLN2_dat_txt, MLN2_vol_txt)   
+    
     MLN2_time = '{} {}\n'.format(MLN2.split(',')[0], MLN2.split(',')[1])
     MLN2_time = datetime.datetime(int(MLN2.split(',')[0].split('-')[0]), 
                                   int(MLN2.split(',')[0].split('-')[1]), 
@@ -187,38 +264,41 @@ def check_MLN2_data(MLN2_dat_txt, MLN2_vol_txt):
     MLN2_vol  = MLN2.split(',')[2]
     MLN2_max  = MLN2.split(',')[3]
     MLN2_tp   = MLN2.split(',')[4]
+    
     if float(MLN2_vol) > 11.5:
         MLN2_vol_code = 1
-        MLN2_vol_txt  = "北二測站電壓({})正常。\n".format(MLN2_vol)  
-        
+        MLN2_vol_txt  = "{}測站電壓({})正常。\n".format(name, MLN2_vol)
+    else:
+        MLN2_vol_code = 2
+        MLN2_vol_txt  = "[***異常***]{}測站電壓({})。\n".format(name,MLN2_vol)        
     # -------------------------------------------------------------------------    
     
     if  float(MLN2_max) <= 0.8:
         MLN2_max_code = 1
-        MLN2_max_txt  = "北二波高({})公尺測站正常。\n".format(MLN2_max)       
+        MLN2_max_txt  = "{}波高({})公尺測站正常。\n".format(name, MLN2_max)       
 
     elif  0.8 < float(MLN2_max) < 1.2:
         MLN2_max_code = 2
-        MLN2_max_txt  = "北二測站測得波高{}公尺發出預警。\n".format(MLN2_max)
+        MLN2_max_txt  = "{}測站測得波高{}公尺發出預警。\n".format(name, MLN2_max)
         
 
     else:
         MLN2_max_code = 3
-        MLN2_max_txt  = "北二測站測得波高{}公尺發出警報。\n".format(MLN2_max)   
+        MLN2_max_txt  = "{}測站測得波高{}公尺發出警報。\n".format(name, MLN2_max)   
     
     # -------------------------------------------------------------------------    
        
     if  float(MLN2_tp) <= 7.3:
         MLN2_tp_code = 1
-        MLN2_tp_txt  = "北二測站週期({})秒正常。\n".format(MLN2_tp)        
+        MLN2_tp_txt  = "{}測站週期({})秒正常。\n".format(name, MLN2_tp)        
 
     elif  7.3 < float(MLN2_tp) < 8:
         MLN2_tp_code = 2
-        MLN2_tp_txt  = "北二測站測得週期{}秒發出預警。\n".format(MLN2_tp)
+        MLN2_tp_txt  = "{}測站測得週期{}秒發出預警。\n".format(name, MLN2_tp)
 
     else:
         MLN2_tp_code = 3
-        MLN2_tp_txt  = "北二測站測得週期{}秒發出警報。\n".format(MLN2_tp)   
+        MLN2_tp_txt  = "{}測站測得週期{}秒發出警報。\n".format(name, MLN2_tp)   
     
     if MLN2_vol_code + MLN2_max_code + MLN2_tp_code != 3:
         # MLN2_code   = '[vol, max, tp] = {},{},{}'.format(MLN2_vol_code, MLN2_max_code, MLN2_tp_code)
@@ -227,76 +307,19 @@ def check_MLN2_data(MLN2_dat_txt, MLN2_vol_txt):
         MLN2_sataus = '{}\n{}{}{}'.format(MLN2_time, MLN2_vol_txt, MLN2_max_txt, MLN2_tp_txt)
         
     else:
-        MLN2_sataus = '{}:北二測站資料正常。'.format(MLN2_time)
+        MLN2_sataus = '{}:{}測站資料正常。'.format(MLN2_time, name)
     
-    global MLN2_detail
+    # global MLN2_detail
     MLN2_detail = '{}\n{}{}{}'.format(MLN2_time, MLN2_vol_txt, MLN2_max_txt, MLN2_tp_txt)
-    return(MLN2_time_delta, MLN2_sataus)
-
-def check_MLN5_data(MLN5_dat_txt, MLN5_vol_txt):
-    MLN5 = parse_ML_txt(MLN5_dat_txt, MLN5_vol_txt)
-    MLN5_time = '{} {}\n'.format(MLN5.split(',')[0], MLN5.split(',')[1]) 
-    MLN5_time = datetime.datetime(int(MLN5.split(',')[0].split('-')[0]), 
-                                  int(MLN5.split(',')[0].split('-')[1]), 
-                                  int(MLN5.split(',')[0].split('-')[2]),
-                                  int(MLN5.split(',')[1].split(':')[0]), 
-                                  int(MLN5.split(',')[1].split(':')[1]), 
-                                  int(MLN5.split(',')[1].split(':')[2]))
-
-    MLN5_time_delta = (datetime.datetime.now()-MLN5_time).total_seconds()/3600
-    MLN5_vol  = MLN5.split(',')[2]
-    MLN5_max  = MLN5.split(',')[3]
-    MLN5_tp   = MLN5.split(',')[4]
-    if float(MLN5_vol) > 11.5:
-        MLN5_vol_code = 1
-        MLN5_vol_txt  = "北五測站電壓({})正常。\n".format(MLN5_vol) 
-        
-    # -------------------------------------------------------------------------    
     
-    if  float(MLN5_max) <= 0.8:
-        MLN5_max_code = 1
-        MLN5_max_txt  = "北五波高({})公尺測站正常。\n".format(MLN5_max)        
-
-    elif  0.8 < float(MLN5_max) < 1.2:
-        MLN5_max_code = 2
-        MLN5_max_txt  = "北五測站測得波高{}公尺發出預警。\n".format(MLN5_max)   
-
-    else:
-        MLN5_max_code = 3
-        MLN5_max_txt  = "北五測站測得波高{}公尺發出警報。\n".format(MLN5_max) 
-    
-    # -------------------------------------------------------------------------
-        
-    if  float(MLN5_tp) <= 6:
-        MLN5_tp_code = 1
-        MLN5_tp_txt  = "北五週期({})秒測站正常。\n".format(MLN5_tp)        
-
-    elif  6 < float(MLN5_max) < 8:
-        MLN5_tp_code = 2
-        MLN5_tp_txt  = "北五測站測得週期{}秒發出預警。\n".format(MLN5_tp)   
-
-    else:
-        MLN5_tp_code = 3
-        MLN5_tp_txt  = "北五測站測得週期{}秒發出警報。\n".format(MLN5_tp)    
-
-    if MLN5_vol_code + MLN5_max_code + MLN5_tp_code != 3:
-        MLN5_code   = '[vol, max, tp] = {},{},{}'.format(MLN5_vol_code, MLN5_max_code, MLN5_tp_code)
-        # print(MLN5_code)
-        
-        MLN5_sataus = '{}\n{}{}{}'.format(MLN5_time, MLN5_vol_txt, MLN5_max_txt, MLN5_tp_txt)     
-        
-     
-    else:
-        MLN5_sataus = '{}:北五測站資料正常。'.format(MLN5_time)
-
-    global MLN5_detail
-    MLN5_detail = '{}\n{}{}{}'.format(MLN5_time, MLN5_vol_txt, MLN5_max_txt, MLN5_tp_txt)    
-
-    return(MLN5_time_delta, MLN5_sataus)
+    return(MLN2_time_delta, MLN2_sataus, MLN2_time, MLN2_detail)
 
 def Bat_ML_check():
-    [MLN2_time_delta, MLN2_sataus] = check_MLN2_data(MLN2_dat_txt, MLN2_vol_txt)
-    [MLN5_time_delta, MLN5_sataus] = check_MLN5_data(MLN5_dat_txt, MLN5_vol_txt)
+    # 這裡抓RAW DATA
+    global MLN2_detail
+    global MLN5_detail
+    [MLN2_time_delta, MLN2_sataus, MLN2_time, MLN2_detail] = check_MLN2_data(MLN2_dat_txt, MLN2_vol_txt, '北二')
+    [MLN5_time_delta, MLN5_sataus, MLN5_time, MLN5_detail] = check_MLN2_data(MLN5_dat_txt, MLN5_vol_txt, '北五')
     
     if MLN2_time_delta > 12:
         MLN2_sataus = '北二測站超過{}小時無數據回傳\n最後回傳時間{}\n'.format(12,MLN2_time)
@@ -306,7 +329,20 @@ def Bat_ML_check():
         MLN5_sataus = '北五測站超過{}小時無數據回傳\n最後回傳時間{}\n'.format(12,MLN5_time)   
 
 
-    ML_text = '麥寮港即時波浪系統:\n\n{}\n\n{}'.format(MLN2_sataus, MLN5_sataus)
+    # 這裡檢查網頁
+    try:
+        r    = requests.head(ML_URL)
+        code = r.status_code
+        
+        if code == 200:
+            ML_URL_status = "麥寮港網頁:正常".format(code)
+        else:
+            ML_URL_status = "麥寮港網頁:***異常***(除錯代碼{})".format(code)
+        # prints the int of the status code. Find more at httpstatusrappers.com :)
+    except requests.ConnectionError:
+        ML_URL_status = "麥寮港網頁:***異常***\n{}".format(ML_URL)
+        # print("[麥寮港網頁異常]:{}".format(ML_URL))  
+    ML_text = '麥寮港即時波浪系統:\n\n{}\n\n{}\n\n{}'.format(ML_URL_status, MLN2_sataus, MLN5_sataus)
     return(ML_text)
 
 def Bat_check_HADCP():
@@ -328,24 +364,40 @@ def print_detail():
     
     return('\n* * * * * * * * * *\n{}\n{}\n{}\n'.format(MLN2_detail, MLN5_detail, HADCP_detil))
 
-
 def log(text):
     with open(r'C:\Users\USER\Documents\LOG\auto_check.txt', 'a', encoding='utf8') as logs:
         logs.write(text)
     
-webHADCP_status = parse_KHurl()
-dbHADCP_status  = Bat_check_HADCP()
-ML_status       = Bat_ML_check()
-realtime_status = '{}\n\n{}'.format(ML_status, webHADCP_status)
+def day_check():
+    webHADCP_status = parse_KHurl()
+    dbHADCP_status  = Bat_check_HADCP()
+    ML_status       = Bat_ML_check()
+    realtime_status = '{}\n\n{}'.format(ML_status, webHADCP_status)
 
 
 
-print(realtime_status)
-log(print_detail())
-# print(dbHADCP_status)
-line_msg(realtime_status)
+    print(realtime_status)
+    log(print_detail())
+    # print(dbHADCP_status)
+    line_msg(realtime_status)
 
 
+day_check()
 
+# if __name__ == '__main__':
 
+    # if len(sys.argv) < 2:
+        # webHADCP_status = parse_KHurl()
+        # dbHADCP_status  = Bat_check_HADCP()
+        # ML_status       = Bat_ML_check()
+        # sss             = '\n\n- - - - - - - - - 分隔線 - - - - - - - -\n\n' 
+        # realtime_status = '{}{}{}'.format(ML_status, sss,webHADCP_status)
+        # print(realtime_status)
+        # sys.exit()
+    
+    # elif sys.argv[1] == 'day':
+        # day_check()
+
+    # elif sys.argv[1] == 'hour':
+        # print(sys.argv[1])
 
