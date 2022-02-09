@@ -23,30 +23,30 @@ for work_day in root_path.iterdir():
 for work_day in root_path.iterdir():
     for work_center in work_day.iterdir():
         for work_ship in work_center.iterdir():
-            if os.path.isdir(work_ship):
+            print(work_ship)
         
-                img_dir = work_ship.joinpath('02.回報照片')
-                if img_dir.exists():
-                    pass
-                    # print(img_dir)
-                else:
-                    img_dir.mkdir(parents=True, exist_ok=True)
+            img_dir = work_ship.joinpath('02.回報照片')
+            if img_dir.exists():
+                pass
+                # print(img_dir)
+            else:
+                img_dir.mkdir(parents=True, exist_ok=True)
 
 
-                if len(os.listdir(img_dir)) == 0:
-                    tatal_dic[work_center.name] += 1
-                else:
-                    tatal_dic[work_center.name] += 1
-                    valid_dic[work_center.name] += 1
-                    
-                for img_path in img_dir.glob('**/*'):
-                    
-                    center_name = img_path.parents[2].name
-                    ship_name   = img_path.parents[1].name
-                    img_name    = img_path.name
-                    sum_dic[work_center.name].append(img_name)
-                    sum_img += 1
-                    
+            if len(os.listdir(img_dir)) == 0:
+                tatal_dic[work_center.name] += 1
+            else:
+                tatal_dic[work_center.name] += 1
+                valid_dic[work_center.name] += 1
+                
+            for img_path in img_dir.glob('**/*'):
+                
+                center_name = img_path.parents[2].name
+                ship_name   = img_path.parents[1].name
+                img_name    = img_path.name
+                sum_dic[work_center.name].append(img_name)
+                sum_img += 1
+                
                 # print(center_name, ship_name, img_path)
 # print(sum_dic)
 # print(len(sum_dic.keys())

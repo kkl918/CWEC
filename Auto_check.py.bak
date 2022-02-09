@@ -376,8 +376,8 @@ def day_check():
     realtime_status = '{}{}{}'.format(ML_status, sss, webHADCP_status)
 
     print(realtime_status)
-    log(print_detail())
-    line_msg(realtime_status)
+    # log(print_detail())
+    # line_msg(realtime_status)
 
 
 day_check()
