@@ -5,7 +5,7 @@
 ## E-mail     : kakinglin@gail.com                                              ##
 ## Note       : 2021/12/25 正式運行                                             ##
 ## LOG        : /home1/cwecA/OPENDAP/cron.log                                   ##
-## crontab    : 00 18 * * * /usr/bin/python3 /home1/cwecA/OPENDAP/BATAPI.py##
+## crontab    : 00 18 * * * /usr/bin/python3 /home1/cwecA/OPENDAP/BATAPI_V3.py  ##
 ##################################################################################
 
 import os, webbrowser, time, pathlib, datetime, subprocess, requests, shutil
@@ -16,8 +16,8 @@ today     = datetime.datetime.today()
 today_str = datetime.datetime.today().strftime("%Y%m%d")
 
 # TEST
-today_str = '20220125'
-print(today_str)
+# today_str = '20220125'
+# print(today_str)
 
 def init(DDD):
     global day                  
@@ -135,6 +135,7 @@ def mergeBYday(day):
             print('File not exist.\n{}\n{}\n'.format(U, V))
     else:
         print('File aleady exist.({})'.format(nas))
+        
 def BatWrork():
     delay_min       = 1  # 每次批次下載延遲多久(分鐘)
     file_sate       = 0  # 下載到幾個檔案(MAX=5)
@@ -179,7 +180,8 @@ def BatWrork():
         log_write('[ERROR] Check data {}.\n'.format(today_str))
         line_msg('***ERROR***')
     
-def main():
+def one_day():
+    
     init(today_str)
     URL = 'https://oceanapi.cwb.gov.tw/opendap/hyrax/OCM/{}/contents.html'.format(day)
     print(URL)
@@ -192,7 +194,8 @@ def main():
         print('[ERROR] URL not exist, status:{}.'.format(URL_status))
 
 def backward_main():
-    for i in range(1,7):
+
+    for i in range(0,7):
         today     = datetime.datetime.today()
         deltaday  = datetime.timedelta(days=-i)
         today     = today + deltaday
@@ -201,7 +204,7 @@ def backward_main():
         print("date and time:",day)
         init(day)
         # print(DL_data)
-        main()
+        one_day()
 
 
 # def DEBUG_USE2():
