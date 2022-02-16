@@ -184,6 +184,7 @@ def parse_KH_txt_debug():
     print('WH',WH[0], WH[1])
     
 def parse_ML_txt(dat_txt, vol_txt):
+    
     with open (vol_txt, 'r', encoding='utf8') as f:
         vol_array = f.readlines()[-50:-1]
         
@@ -200,7 +201,9 @@ def parse_ML_txt(dat_txt, vol_txt):
                 
                 if i[0] == j[0] and i[1] == j[1]:
                     out_array.append('{},{},{},{},{}'.format(i[0], i[1], i[2][:4], j[2], j[3]))
-    # print(dat_time[-1])
+    # print(dat_time)
+    # print(vol_time)
+    # print(out_array)
     if len(out_array) == 0:
         # return('2000-01-01,00:00:00,-1,-1,-1')
         error_out = '{},{},{},{},{}'.format(dat_time[-1][0], dat_time[-1][1], vol_time[2][:4][2], dat_time[-1][2], dat_time[-1][3])
@@ -208,8 +211,11 @@ def parse_ML_txt(dat_txt, vol_txt):
         return(error_out)
         
     else:
+        # print(out_array[-1])
         return(out_array[-1])
-
+    
+    
+    
 def line_msg(text): 
     url     = "https://notify-api.line.me/api/notify"
     token   = "FGKqZNLaKj5Wjr9cpvHHkgs98Yi5c5wYlqtNEnQYiyj"
@@ -252,7 +258,7 @@ def chech_HADCP(txt):
     
 def check_MLN2_data(MLN2_dat_txt, MLN2_vol_txt, name):
     MLN2      = parse_ML_txt(MLN2_dat_txt, MLN2_vol_txt)   
-    
+    # print(MLN2)
     MLN2_time = '{} {}\n'.format(MLN2.split(',')[0], MLN2.split(',')[1])
     MLN2_time = datetime.datetime(int(MLN2.split(',')[0].split('-')[0]), 
                                   int(MLN2.split(',')[0].split('-')[1]), 
@@ -320,6 +326,8 @@ def Bat_ML_check():
     global MLN5_detail
     [MLN2_time_delta, MLN2_sataus, MLN2_time, MLN2_detail] = check_MLN2_data(MLN2_dat_txt, MLN2_vol_txt, '北二')
     [MLN5_time_delta, MLN5_sataus, MLN5_time, MLN5_detail] = check_MLN2_data(MLN5_dat_txt, MLN5_vol_txt, '北五')
+    
+    
     
     if MLN2_time_delta > 12:
         MLN2_sataus = '北二測站超過{}小時無數據回傳\n最後回傳時間{}\n'.format(12,MLN2_time)
