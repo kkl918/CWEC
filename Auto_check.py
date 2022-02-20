@@ -27,137 +27,152 @@ KH_array     = [HADCP_C1_txt, HADCP_C2_txt, KH_NS_txt, KH_NW_txt, KH_WH_txt]
 
 def parse_KHurl_station():
     url   = 'http://cwec.twport.com.tw/index.php'
-    res   = requests.get(url)
-    soup  = BeautifulSoup(res.text, 'html.parser')
+    
+    try:
+        r    = requests.head(ML_URL)
+        code = r.status_code
+        if code == 200:        
+            res   = requests.get(url)
+            soup  = BeautifulSoup(res.text, 'html.parser')
 
 
-    content_array = [i for i in soup.text.split('\n') if i != '']
+            content_array = [i for i in soup.text.split('\n') if i != '']
 
-    ne = [[i, j] for i, j in enumerate(content_array) if j == '北堤東面']
-    ns = [[i, j] for i, j in enumerate(content_array) if j == '北堤南面']
-    ww = [[i, j] for i, j in enumerate(content_array) if j == '西堤']
+            ne = [[i, j] for i, j in enumerate(content_array) if j == '北堤東面']
+            ns = [[i, j] for i, j in enumerate(content_array) if j == '北堤南面']
+            ww = [[i, j] for i, j in enumerate(content_array) if j == '西堤']
 
-    ne_status = [content_array[ne[0][0]+0], content_array[ne[0][0]+1].replace(' ',''), content_array[ne[0][0]+4].replace(' ','')]
-    ns_status = [content_array[ns[0][0]+0], content_array[ns[0][0]+1].replace(' ',''), content_array[ns[0][0]+4].replace(' ','')]
-    ww_status = [content_array[ww[0][0]+0], content_array[ww[0][0]+1].replace(' ',''), content_array[ww[0][0]+4].replace(' ','')]
+            ne_status = [content_array[ne[0][0]+0], content_array[ne[0][0]+1].replace(' ',''), content_array[ne[0][0]+4].replace(' ','')]
+            ns_status = [content_array[ns[0][0]+0], content_array[ns[0][0]+1].replace(' ',''), content_array[ns[0][0]+4].replace(' ','')]
+            ww_status = [content_array[ww[0][0]+0], content_array[ww[0][0]+1].replace(' ',''), content_array[ww[0][0]+4].replace(' ','')]
 
-    ne_time_list = [ int(i) for i in ne_status[1].split('-') + ne_status[2].split(':')]
-    ns_time_list = [ int(i) for i in ns_status[1].split('-') + ns_status[2].split(':')]
-    ww_time_list = [ int(i) for i in ww_status[1].split('-') + ww_status[2].split(':')]
+            ne_time_list = [ int(i) for i in ne_status[1].split('-') + ne_status[2].split(':')]
+            ns_time_list = [ int(i) for i in ns_status[1].split('-') + ns_status[2].split(':')]
+            ww_time_list = [ int(i) for i in ww_status[1].split('-') + ww_status[2].split(':')]
 
-    # print(ne_status, ne_status[1].split('-')+ ne_status[2].split(':'))
-    # print(ns_status, ns_status[1].split('-')+ ns_status[2].split(':'))
-    # print(ww_status, ww_status[1].split('-')+ ww_status[2].split(':'))
+            # print(ne_status, ne_status[1].split('-')+ ne_status[2].split(':'))
+            # print(ns_status, ns_status[1].split('-')+ ns_status[2].split(':'))
+            # print(ww_status, ww_status[1].split('-')+ ww_status[2].split(':'))
 
 
-    ne_time  = datetime.datetime(ne_time_list[0], ne_time_list[1], ne_time_list[2], ne_time_list[3])
-    ns_time  = datetime.datetime(ns_time_list[0], ns_time_list[1], ns_time_list[2], ns_time_list[3])
-    ww_time  = datetime.datetime(ww_time_list[0], ww_time_list[1], ww_time_list[2], ww_time_list[3])
+            ne_time  = datetime.datetime(ne_time_list[0], ne_time_list[1], ne_time_list[2], ne_time_list[3])
+            ns_time  = datetime.datetime(ns_time_list[0], ns_time_list[1], ns_time_list[2], ns_time_list[3])
+            ww_time  = datetime.datetime(ww_time_list[0], ww_time_list[1], ww_time_list[2], ww_time_list[3])
 
-    ne_delta = (datetime.datetime.now()-ne_time).total_seconds()/3600
-    ns_delta = (datetime.datetime.now()-ns_time).total_seconds()/3600
-    ww_delta = (datetime.datetime.now()-ww_time).total_seconds()/3600
+            ne_delta = (datetime.datetime.now()-ne_time).total_seconds()/3600
+            ns_delta = (datetime.datetime.now()-ns_time).total_seconds()/3600
+            ww_delta = (datetime.datetime.now()-ww_time).total_seconds()/3600
 
-    ne_status.append(str(ne_delta)[:4])
-    ns_status.append(str(ns_delta)[:4])
-    ww_status.append(str(ww_delta)[:4])
+            ne_status.append(str(ne_delta)[:4])
+            ns_status.append(str(ns_delta)[:4])
+            ww_status.append(str(ww_delta)[:4])
 
-    if float(ne_status[3]) < 12:
-        # print('[OK] {}回傳正常({},{})'.format(ne_status[0], ne_status[1], ne_status[2]))
-        ne_ = '{}資料回傳正常({},{})'.format(ne_status[0], ne_status[1], ne_status[2])
-    else:
-        # print('[ERROR] {}回傳異常({},{})'.format(ne_status[0], ne_status[1], ne_status[2]))
-        ne_ = '{}資料回傳異常({},{})'.format(ne_status[0], ne_status[1], ne_status[2])
-        
-    if float(ns_status[3]) < 12:
-        # print('[OK] {}回傳正常({},{})'.format(ns_status[0], ns_status[1], ns_status[2]))
-        ns_ = '{}資料回傳正常({},{})'.format(ns_status[0], ns_status[1], ns_status[2])
-    else:
-        # print('[ERROR] {}回傳異常({},{})'.format(ns_status[0], ns_status[1], ns_status[2]))
-        ns_ = '{}資料回傳異常({},{})'.format(ns_status[0], ns_status[1], ns_status[2])
+            if float(ne_status[3]) < 12:
+                # print('[OK] {}回傳正常({},{})'.format(ne_status[0], ne_status[1], ne_status[2]))
+                ne_ = '{}資料回傳正常({},{})'.format(ne_status[0], ne_status[1], ne_status[2])
+            else:
+                # print('[ERROR] {}回傳異常({},{})'.format(ne_status[0], ne_status[1], ne_status[2]))
+                ne_ = '{}資料回傳異常({},{})'.format(ne_status[0], ne_status[1], ne_status[2])
+                
+            if float(ns_status[3]) < 12:
+                # print('[OK] {}回傳正常({},{})'.format(ns_status[0], ns_status[1], ns_status[2]))
+                ns_ = '{}資料回傳正常({},{})'.format(ns_status[0], ns_status[1], ns_status[2])
+            else:
+                # print('[ERROR] {}回傳異常({},{})'.format(ns_status[0], ns_status[1], ns_status[2]))
+                ns_ = '{}資料回傳異常({},{})'.format(ns_status[0], ns_status[1], ns_status[2])
 
-    if float(ww_status[3]) < 12:
-        # print('[OK] {}回傳正常({},{})'.format(ww_status[0], ww_status[1], ww_status[2]))
-        ww_ = '{}資料回傳正常({},{})'.format(ww_status[0], ww_status[1], ww_status[2])
-    else:
-        # print('[ERROR] {}回傳異常({},{})'.format(ww_status[0], ww_status[1], ww_status[2]))
-        ww_ = '{}資料回傳異常({},{})'.format(ww_status[0], ww_status[1], ww_status[2])
+            if float(ww_status[3]) < 12:
+                # print('[OK] {}回傳正常({},{})'.format(ww_status[0], ww_status[1], ww_status[2]))
+                ww_ = '{}資料回傳正常({},{})'.format(ww_status[0], ww_status[1], ww_status[2])
+            else:
+                # print('[ERROR] {}回傳異常({},{})'.format(ww_status[0], ww_status[1], ww_status[2]))
+                ww_ = '{}資料回傳異常({},{})'.format(ww_status[0], ww_status[1], ww_status[2])
 
-    return('\n\n{}\n\n{}\n\n{}\n\n'.format(ne_, ns_, ww_))
-
+            return('\n\n{}\n\n{}\n\n{}\n\n'.format(ne_, ns_, ww_))
+    
+    except requests.ConnectionError:
+        return('\n\n{}\n網頁異常\n\n'.format(url))
 
 def parse_KHurl():
     # 這裡處理電壓供應模組
     url   = 'http://cwec.twport.com.tw/index.php'
-    res   = requests.get(url)
-    soup  = BeautifulSoup(res.text, 'html.parser')
-      
-    re1              = re.compile(r'電壓').search(soup.text)
-    
-    date             = soup.text[re1.span()[1]+1:re1.span()[1]+17].replace('\t', '').replace(' ', '')[0:10]
-    time             = soup.text[re1.span()[1]+1:re1.span()[1]+17].replace('\t', '').replace(' ', '')[10:]
-    re1              = re.compile(r'西防波堤測站').search(soup.text)
-    target           = soup.text[re1.span()[0]:re1.span()[1]+42].replace('\t', '').replace(' ', '').replace('xa0', '')
-    
-    wHADCP_name      = (''.join(target.split('\n')[0].split())[:6])
-    wHADCP_vol       = (''.join(target.split('\n')[0].split())[6:10])
-    
-    nHADCP_name      = (''.join(target.split('\n')[1].split())[:6])
-    nHADCP_vol       = (''.join(target.split('\n')[1].split())[6:10])
-    y                = int(date.split('-')[0])
-    m                = int(date.split('-')[1])
-    d                = int(date.split('-')[2])
-           
-    hr               = int(time.split(':')[0])
-    mins             = int(time.split(':')[1])
-    HADCP_time       = datetime.datetime(y, m, d, hr, mins)   
-    HADCP_time_delta = (datetime.datetime.now()-HADCP_time).total_seconds()/3600
 
-    if HADCP_time_delta < 12:
-        webHADCP_code     = 1
-        webHADCP_status   = '高雄港網頁資料傳輸正常'
-        if float(wHADCP_vol) < 11.5:
-            wHADCP_code   = -1
-            wHADCP_status = '{}電壓異常({})'.format(nHADCP_name, wHADCP_vol)
+    try:
+        r    = requests.head(ML_URL)
+        code = r.status_code
+        if code == 200:   
+            res   = requests.get(url)
+            soup  = BeautifulSoup(res.text, 'html.parser')
+              
+            re1              = re.compile(r'電壓').search(soup.text)
             
-        else:
-            wHADCP_code   = 1
-            wHADCP_status = '{}電壓正常({})'.format(wHADCP_name, wHADCP_vol)
+            date             = soup.text[re1.span()[1]+1:re1.span()[1]+17].replace('\t', '').replace(' ', '')[0:10]
+            time             = soup.text[re1.span()[1]+1:re1.span()[1]+17].replace('\t', '').replace(' ', '')[10:]
+            re1              = re.compile(r'西防波堤測站').search(soup.text)
+            target           = soup.text[re1.span()[0]:re1.span()[1]+42].replace('\t', '').replace(' ', '').replace('xa0', '')
             
-        if float(wHADCP_vol) < 11.5:   
-            nHADCP_code   = -1
-            nHADCP_status = '{}電壓異常({})'.format(nHADCP_name, nHADCP_vol)  
-        else:
-            nHADCP_code   = 1
-            nHADCP_status = '{}電壓正常({})'.format(nHADCP_name, nHADCP_vol)
+            wHADCP_name      = (''.join(target.split('\n')[0].split())[:6])
+            wHADCP_vol       = (''.join(target.split('\n')[0].split())[6:10])
             
-    else:
-        nHADCP_code       = -1
-        nHADCP_status     = '{}最後一次回傳電壓({})'.format(nHADCP_name, nHADCP_vol)
-        
-        wHADCP_code       = -1
-        wHADCP_status     = '{}最後一次回傳電壓({})'.format(wHADCP_name, wHADCP_vol)
+            nHADCP_name      = (''.join(target.split('\n')[1].split())[:6])
+            nHADCP_vol       = (''.join(target.split('\n')[1].split())[6:10])
+            y                = int(date.split('-')[0])
+            m                = int(date.split('-')[1])
+            d                = int(date.split('-')[2])
+                   
+            hr               = int(time.split(':')[0])
+            mins             = int(time.split(':')[1])
+            HADCP_time       = datetime.datetime(y, m, d, hr, mins)   
+            HADCP_time_delta = (datetime.datetime.now()-HADCP_time).total_seconds()/3600
+
+            if HADCP_time_delta < 12:
+                webHADCP_code     = 1
+                webHADCP_status   = '高雄港網頁資料傳輸正常'
+                if float(wHADCP_vol) < 11.5:
+                    wHADCP_code   = -1
+                    wHADCP_status = '{}電壓異常({})'.format(nHADCP_name, wHADCP_vol)
+                    
+                else:
+                    wHADCP_code   = 1
+                    wHADCP_status = '{}電壓正常({})'.format(wHADCP_name, wHADCP_vol)
+                    
+                if float(wHADCP_vol) < 11.5:   
+                    nHADCP_code   = -1
+                    nHADCP_status = '{}電壓異常({})'.format(nHADCP_name, nHADCP_vol)  
+                else:
+                    nHADCP_code   = 1
+                    nHADCP_status = '{}電壓正常({})'.format(nHADCP_name, nHADCP_vol)
+                    
+            else:
+                nHADCP_code       = -1
+                nHADCP_status     = '{}最後一次回傳電壓({})'.format(nHADCP_name, nHADCP_vol)
+                
+                wHADCP_code       = -1
+                wHADCP_status     = '{}最後一次回傳電壓({})'.format(wHADCP_name, wHADCP_vol)
+                 
+                webHADCP_code     = -1
+                webHADCP_status   = '[***高雄港網頁電壓回傳異常***]，目前超過12小時未回傳'
+                
+            HADCP_stastus         = '\n\n網頁最後更新時間:{}\n\n{}\n\n{}\n\n{}\n\n{}\n'.format(HADCP_time, webHADCP_status, nHADCP_status, wHADCP_status, 'http://cwec.twport.com.tw/')
+            
+            global HADCP_detil
+            HADCP_detil           = '{}\n\n{}\n\n{}\n\n{}\n'.format(HADCP_time, webHADCP_status, nHADCP_status, wHADCP_status)
+            
+            # print(HADCP_time)
+            # print(webHADCP_status)
+            # print(nHADCP_status)
+            # print(wHADCP_status)
          
-        webHADCP_code     = -1
-        webHADCP_status   = '[***高雄港網頁電壓回傳異常***]，目前超過12小時未回傳'
+            if webHADCP_code + nHADCP_code + wHADCP_code == 3:
+                HADCP_stastus = '電壓供應模組:正常({})\n\n北站電壓{}v,西站電壓{}v。'.format(HADCP_time, nHADCP_vol, wHADCP_vol)
+            # print( HADCP_stastus)
+            
+            HADCP_stastus = '高雄港海流測站:\n\n{}{}'.format(HADCP_stastus, parse_KHurl_station())
+            return(HADCP_stastus)
+    except requests.ConnectionError:
+        HADCP_detil = '\n\n{}\n***高雄港網頁異常***\n\n'.format(url)
+        return(HADCP_detil)
         
-    HADCP_stastus         = '\n\n網頁最後更新時間:{}\n\n{}\n\n{}\n\n{}\n\n{}\n'.format(HADCP_time, webHADCP_status, nHADCP_status, wHADCP_status, 'http://cwec.twport.com.tw/')
-    
-    global HADCP_detil
-    HADCP_detil           = '{}\n\n{}\n\n{}\n\n{}\n'.format(HADCP_time, webHADCP_status, nHADCP_status, wHADCP_status)
-    
-    # print(HADCP_time)
-    # print(webHADCP_status)
-    # print(nHADCP_status)
-    # print(wHADCP_status)
- 
-    if webHADCP_code + nHADCP_code + wHADCP_code == 3:
-        HADCP_stastus = '電壓供應模組:正常({})\n\n北站電壓{}v,西站電壓{}v。'.format(HADCP_time, nHADCP_vol, wHADCP_vol)
-    # print( HADCP_stastus)
-    
-    HADCP_stastus = '高雄港海流測站:\n\n{}{}'.format(HADCP_stastus, parse_KHurl_station())
-    return(HADCP_stastus)
-
 def parse_KH_txt(txt):
     with open (txt, 'r', encoding='utf8') as f:
         vol_array = f.readlines()[-50:-1]
@@ -203,7 +218,7 @@ def parse_ML_txt(dat_txt, vol_txt):
                     out_array.append('{},{},{},{},{}'.format(i[0], i[1], i[2][:4], j[2], j[3]))
     # print(dat_time)
     # print(vol_time)
-    # print(out_array)
+    # print(out_array[-3:])
     if len(out_array) == 0:
         # return('2000-01-01,00:00:00,-1,-1,-1')
         error_out = '{},{},{},{},{}'.format(dat_time[-1][0], dat_time[-1][1], vol_time[2][:4][2], dat_time[-1][2], dat_time[-1][3])
@@ -249,7 +264,7 @@ def chech_HADCP(txt):
             else:    
                 HADCP_status = '{} {} 電壓正常({})'.format(                  HADCP_time, name, str(HADCP_voltahe))
         else:
-            HADCP_status = '{} {} 資料傳輸異常，超過{}小時未回傳電壓'.format(HADCP_time, name, 12)
+            HADCP_status = '{} {} 資料傳輸異常***超過{}小時未回傳電壓***'.format(HADCP_time, name, 12)
         return(HADCP_status)
     else:
         name = os.path.split(txt)[1]
@@ -267,6 +282,7 @@ def check_MLN2_data(MLN2_dat_txt, MLN2_vol_txt, name):
                                   int(MLN2.split(',')[1].split(':')[1]), 
                                   int(MLN2.split(',')[1].split(':')[2]))
     MLN2_time_delta = (datetime.datetime.now()-MLN2_time).total_seconds()/3600
+    # print(MLN2)
     MLN2_vol  = MLN2.split(',')[2]
     MLN2_max  = MLN2.split(',')[3]
     MLN2_tp   = MLN2.split(',')[4]
@@ -330,11 +346,11 @@ def Bat_ML_check():
     
     
     if MLN2_time_delta > 12:
-        MLN2_sataus = '北二測站超過{}小時無數據回傳\n最後回傳時間{}\n'.format(12,MLN2_time)
+        MLN2_sataus = '***北二測站超過{}小時無數據回傳***\n最後回傳時間{}\n'.format(12,MLN2_time)
 
 
     if MLN5_time_delta > 12:
-        MLN5_sataus = '北五測站超過{}小時無數據回傳\n最後回傳時間{}\n'.format(12,MLN5_time)   
+        MLN5_sataus = '***北五測站超過{}小時無數據回傳***\n最後回傳時間{}\n'.format(12,MLN5_time)   
 
 
     # 這裡檢查網頁
@@ -381,7 +397,7 @@ def day_check():
     dbHADCP_status  = Bat_check_HADCP()
     ML_status       = Bat_ML_check()
     sss             = '\n\n- - - - - - - - - 分隔線 - - - - - - - -\n\n'
-    realtime_status = '{}{}{}'.format(ML_status, sss, webHADCP_status)
+    realtime_status = '{}{}{}{}'.format(ML_status, sss, webHADCP_status, dbHADCP_status)
 
     print(realtime_status)
     log(print_detail())
