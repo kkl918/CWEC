@@ -1,0 +1,28 @@
+## WB/WRF
+10 03,09,15,21 * * * /home1/cwecA/CWB/WRF/Prog/wi/wi-op.bat
+41 11 * * * /home1/cwecA/CWB/WRF/Prog/wi/wi_2nc_d-op.csh
+11 01 10 * * /home1/cwecA/CWB/WRF/Prog/wi/wi_rmTmp.csh
+#10 03,09,15,21 * * * /home1/cwecA/CWB/WRF/Prog/wi/1.getWD02-op.bat
+#00 04,10,16,22 * * * /home1/cwecA/CWB/WRF/Prog/wi/2.grb2nc.bat
+10 05,11,17,23 * * * /home1/cwecA/CWB/WRF/Prog/wh/1.getWD01-op.bat
+
+##  CWB/OCM2
+00 07 * * * /home1/cwecA/CWB/OCM2/Prog/1.getOCM2-op.bat
+15 07 * * * /home1/cwecA/CWB/OCM2/Prog/2.OCM2nc.bat
+
+##  CWB/SSC
+03 00 * * * /home1/cwecA/CWB/SSC/bat_CWB_SSC.bat
+
+##  NCEP/GFS  stop on 2021/07/01
+#02 02,08,14,20 * * * /home1/cwecA/NCEP/GFS/Prog/getGFS-op.sh
+#01 13 * * * /home1/cwecA/NCEP/GFS/Prog/gfs_py.csh
+
+# CWB/OCM
+00 */8 * * * /usr/bin/python3 /home1/cwecA/OPENDAP/BATAPI_V3.py
+
+# WRF CHECK
+00 */8 * * * /usr/bin/python3 /home1/cwecA/check_WRF.py
+#00 15  * * 3  /usr/bin/python3 /home1/cwecA/check_WRF.py -week_check
+
+
+

@@ -11,11 +11,14 @@ MLN5_vol_txt = Path(r'\\203.64.168.116\raw_data\107ML_RTAWAC\MLN5_AWAC\adam-MLN5
 ML_URL       = 'http://203.64.168.5/index.html' 
 # ML_URL       = 'https://www.google.com.tw' 
 
-HADCP_C1_txt = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-C1\2201_HADCP_KH-C1_SD.txt'
-HADCP_C2_txt = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-C2\2201_HADCP_KH-C2_SD.txt'
-KH_NS_txt    = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-NS\2201_HADCP_KH-NS_SD.txt'
-KH_NW_txt    = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-NW\2201_HADCP_KH-NW_SD.txt'
-KH_WH_txt    = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-W\2201_HADCP_KH-W_SD.txt'
+month_str    = datetime.datetime.today().strftime("%Y%m")[2:]
+
+HADCP_C1_txt = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-C1\{}_HADCP_KH-C1_SD.txt'.format(month_str)
+HADCP_C2_txt = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-C2\{}_HADCP_KH-C2_SD.txt'.format(month_str)
+KH_NS_txt    = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-NS\{}_HADCP_KH-NS_SD.txt'.format(month_str)
+KH_NW_txt    = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-NW\{}_HADCP_KH-NW_SD.txt'.format(month_str)
+KH_WH_txt    = r'\\203.64.168.116\raw_data\108KH_TWPORT\HADCP-W\{}_HADCP_KH-W_SD.txt'.format(month_str)
+
 KH_array     = [HADCP_C1_txt, HADCP_C2_txt, KH_NS_txt, KH_NW_txt, KH_WH_txt]
 
 # DEBUG
@@ -27,7 +30,6 @@ KH_array     = [HADCP_C1_txt, HADCP_C2_txt, KH_NS_txt, KH_NW_txt, KH_WH_txt]
 
 def parse_KHurl_station():
     url   = 'http://cwec.twport.com.tw/index.php'
-    
     try:
         r    = requests.head(ML_URL)
         code = r.status_code
@@ -130,15 +132,16 @@ def parse_KHurl():
                 webHADCP_status   = '高雄港網頁資料傳輸正常'
                 if float(wHADCP_vol) < 11.5:
                     wHADCP_code   = -1
-                    wHADCP_status = '{}電壓異常({})'.format(nHADCP_name, wHADCP_vol)
+                    wHADCP_status = '{}電壓***異常({})***'.format(wHADCP_name, wHADCP_vol)
                     
                 else:
                     wHADCP_code   = 1
                     wHADCP_status = '{}電壓正常({})'.format(wHADCP_name, wHADCP_vol)
                     
-                if float(wHADCP_vol) < 11.5:   
+                if float(nHADCP_vol) < 11.5:  
+
                     nHADCP_code   = -1
-                    nHADCP_status = '{}電壓異常({})'.format(nHADCP_name, nHADCP_vol)  
+                    nHADCP_status = '{}電壓***異常({})***'.format(nHADCP_name, nHADCP_vol)  
                 else:
                     nHADCP_code   = 1
                     nHADCP_status = '{}電壓正常({})'.format(nHADCP_name, nHADCP_vol)
@@ -246,7 +249,7 @@ def chech_HADCP(txt):
     data = parse_KH_txt(txt)
     name = os.path.split(txt)[1][11:-7]
     # print(data)
-    if data[1] != -1:
+    if data[1] != -1 and data[0] != '':
         # print(data[0], data[1])
         y    = int(data[0].split(' ')[0].split('-')[0])
         m    = int(data[0].split(' ')[0].split('-')[1])
@@ -260,12 +263,13 @@ def chech_HADCP(txt):
         HADCP_time_delta = (datetime.datetime.now()-HADCP_time).total_seconds()/3600
         if HADCP_time_delta < 12:
             if HADCP_voltahe < 11.5:
-                HADCP_status = '{} {} 電壓異常({})'.format(                  HADCP_time, name, str(HADCP_voltahe))
+                HADCP_status = '{} {} 電壓***異常({})***'.format(                  HADCP_time, name, str(HADCP_voltahe))
             else:    
                 HADCP_status = '{} {} 電壓正常({})'.format(                  HADCP_time, name, str(HADCP_voltahe))
         else:
             HADCP_status = '{} {} 資料傳輸異常***超過{}小時未回傳電壓***'.format(HADCP_time, name, 12)
         return(HADCP_status)
+    
     else:
         name = os.path.split(txt)[1]
         HADCP_status = '{} {} 資料傳輸異常，回傳數值為空'.format(data[0], name)
@@ -337,21 +341,20 @@ def check_MLN2_data(MLN2_dat_txt, MLN2_vol_txt, name):
     return(MLN2_time_delta, MLN2_sataus, MLN2_time, MLN2_detail)
 
 def Bat_ML_check():
+
     # 這裡抓RAW DATA
     global MLN2_detail
     global MLN5_detail
+
     [MLN2_time_delta, MLN2_sataus, MLN2_time, MLN2_detail] = check_MLN2_data(MLN2_dat_txt, MLN2_vol_txt, '北二')
     [MLN5_time_delta, MLN5_sataus, MLN5_time, MLN5_detail] = check_MLN2_data(MLN5_dat_txt, MLN5_vol_txt, '北五')
-    
-    
-    
+        
     if MLN2_time_delta > 12:
         MLN2_sataus = '***北二測站超過{}小時無數據回傳***\n最後回傳時間{}\n'.format(12,MLN2_time)
 
 
     if MLN5_time_delta > 12:
         MLN5_sataus = '***北五測站超過{}小時無數據回傳***\n最後回傳時間{}\n'.format(12,MLN5_time)   
-
 
     # 這裡檢查網頁
     try:

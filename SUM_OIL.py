@@ -2,21 +2,60 @@
 
 import os, shutil
 from pathlib import Path
+import tkinter as tk
+from tkinter import filedialog as fd
 
-kk = '111年01月'
+tk_root = tk.Tk()
 
-dst_path       = Path(r'C:\Users\USER\Desktop\輸油作業通報\IMGS')
-dst_path       = Path(r'\\203.64.168.112\oca專案辦公室\(2)輸油作業通報\TEST\9-12成果')
+tk_Path = fd.askdirectory()
 
-dirpath        = r'C:\Users\USER\Desktop\輸油作業通報\{}'.format(kk)
-root_path      = Path(dirpath)
 
-sum_dic        = {}
-tatal_dic      = {}
-valid_dic      = {}
-sum_img        = 0
+if tk_Path != '':
+    print(tk_Path)
+    dst_path       = Path(r'C:\Users\USER\Desktop\輸油作業通報\IMGS')
+    dst_path       = Path(r'\\203.64.168.112\oca專案辦公室\(2)輸油作業通報\TEST\9-12成果')
 
-img_list       = []
+    dirpath        = tk_Path
+    
+    # pathlib.Path(dirpath.joinpath('')).mkdir(parents=True, exist_ok=True)
+    root_path      = Path(dirpath)
+    # print(dirpath.split('\\'))
+
+    trans_type  = dirpath.split('/')[-1]
+    trans_month = dirpath.split('/')[-2]
+
+
+    sum_dic        = {}
+    tatal_dic      = {}
+    valid_dic      = {}
+    sum_img        = 0
+
+    img_list       = []
+    
+
+
+else:
+    print('沒有選取資料夾')
+    exit()
+    # dst_path       = Path(r'C:\Users\USER\Desktop\輸油作業通報\IMGS')
+    # dst_path       = Path(r'\\203.64.168.112\oca專案辦公室\(2)輸油作業通報\TEST\9-12成果')
+
+    # dirpath        = r'C:\Users\USER\Desktop\輸油作業通報\111年02月\化學品'
+
+    # root_path      = Path(dirpath)
+
+    # trans_type  = dirpath.split('\\')[-1]
+    # trans_month = dirpath.split('\\')[-2]
+
+
+    # sum_dic        = {}
+    # tatal_dic      = {}
+    # valid_dic      = {}
+    # sum_img        = 0
+
+    # img_list       = []    
+    # print(dirpath)
+
 
 # 遞迴尋找照片
 def iterfind_img(dir_path):
@@ -37,7 +76,9 @@ def iterfind_img(dir_path):
             iterfind_img(item)
     
 
+
 for work_day in root_path.iterdir():
+    # print(work_day)
     for work_center in work_day.iterdir():
         sum_dic[work_center.name]   = []
         tatal_dic[work_center.name] = 0
@@ -64,7 +105,7 @@ for work_day in root_path.iterdir():
                     valid_dic[work_center.name] += 1
                  
                 iterfind_img(img_dir)    
-                # for img_path in img_dir.glob('**/*'):
+                            # for img_path in img_dir.glob('**/*'):
                     # if img_path.is_file():
                         # center_name = img_path.parents[2].name
                         # ship_name   = img_path.parents[1].name
@@ -94,14 +135,14 @@ for key in sum_dic.keys():
         # print(report_file)
         # shutil.copy(report_file, dst_path.joinpath(nn))
 
+    
 
 
-
-print(kk)
+# print(str(root_path.parents[0]))
 print('單位照片總量,實際通報次數,應通報次數,通報率')
-csv_file = r'C:\Users\USER\Desktop\{}.csv'.format(kk)
+csv_file = r'{}\{}_{}.csv'.format(str(root_path.parents[0]), trans_month, trans_type)
 with open(csv_file, 'w', encoding = 'utf-8-sig')as f:
-    f.write('{}\n'.format(kk))
+    f.write('{}\n'.format(trans_month))
     f.write('單位名稱,照片總量,實際通報次數,應通報次數,通報率\n')
     for i in sum_dic.keys():
         
@@ -109,3 +150,6 @@ with open(csv_file, 'w', encoding = 'utf-8-sig')as f:
         f.write('{},{},{},{},{:.1%}\n'.format(i, len(sum_dic[i]), valid_dic[i], tatal_dic[i], valid_dic[i]/tatal_dic[i]))
     f.write('合計收到:{}張輸油通報照片'.format(sum_img))
 print('合計收到:{}張輸油通報照片'.format(sum_img))
+
+os.startfile(csv_file)
+# os.system("pause")
