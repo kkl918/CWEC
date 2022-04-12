@@ -153,4 +153,4 @@ with open(csv_file, 'w', encoding = 'utf-8-sig')as f:
 print('合計收到:{}張輸油通報照片'.format(sum_img))
 
 os.startfile(csv_file)
-os.system("pause")
+# os.system("pause")
