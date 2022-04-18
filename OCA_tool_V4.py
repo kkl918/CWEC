@@ -191,7 +191,7 @@ def oil_remain():
     ax.set_xlabel('時間(小時)', fontsize=18)
     # ax.legend(fancybox=True,bbox_to_anchor=(1, 1))
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=5, fancybox=True)
-    ax.set_title("油品隨時間質量平衡圖\n{}，{}{}，{}小時\n".format(oil_type, oil_amount, oil_unit , t_array[-1]), fontsize=32, pad=20,fontweight="bold")
+    ax.set_title("油品隨時間質量平衡圖\n{}，{}{}，{}小時\n".format(oil_type, oil_amount, oil_unit , t_array[-2]), fontsize=32, pad=20,fontweight="bold")
     ax.grid(True)
     # manager = plt.get_current_fig_manager()
     # manager.full_screen_toggle()
