@@ -6,11 +6,19 @@
 ## Note       : 2021/12/25 正式運行                                             ##
 ## LOG        : /home1/cwecA/OPENDAP/cron.log                                   ##
 ## crontab    : 00 18 * * * /usr/bin/python3 /home1/cwecA/OPENDAP/BATAPI_V3.py  ##
-## NOTE       : 2022-04-18 新增指令修改NC起始時間                               ##
 ##################################################################################
 
 import os, webbrowser, time, pathlib, datetime, subprocess, requests, shutil
 from pathlib import Path
+print('\n\n*************************************************************************\n')
+
+today     = datetime.datetime.today()
+today_str = datetime.datetime.today().strftime("%Y%m%d")
+print(today_str)
+
+# TEST
+# today_str = '20220125'
+# print(today_str)
 
 def init(DDD):
     global day                  
@@ -34,7 +42,8 @@ def init(DDD):
     TWrange   = '[0:1:119][0:1:0][440:1:920][280:1:600]' #定義範圍
     len_type  = len(data_type) 
     
-    DL_path   = Path(r'/home1/cwecA/OPENDAP').joinpath(day)                        # 指定下載的路徑
+    # DL_path   = Path(r'/home1/cwecA/OPENDAP').joinpath(day)                        # 指定下載的路徑
+    DL_path   = Path(r'C:\Users\USER\Desktop\OCM_202106').joinpath(day)                        # 指定下載的路徑
     DL_data   = [DL_path.joinpath(i+'.{}.nc.nc4'.format(day)) for i in data_type]
 
     correct_file_size = 74135850
@@ -74,6 +83,7 @@ def BatDownload_nc(sleep_second):
             # print(data_type[index], DL_data[index].as_posix()) 
             
             getData_wget(data_type[index], DL_data[index].as_posix())
+
             time.sleep(sleep_second)
         else:
             file_size = data.stat().st_size
@@ -98,16 +108,14 @@ def mergeBYday(day):
     V    = r'/home1/cwecA/OPENDAP/{}/VCURR.{}.nc.nc4'            .format(day, day)
     fn   = r'/home1/cwecA/OPENDAP/{}/temp{}.nc'                  .format(day, day)
     dump = r'/home1/cwecA/OPENDAP/{}/dump.nc'                    .format(day, day)
-    out  = r'/home1/cwecA/OPENDAP/{}/OCMweb{}_old.nc'                .format(day, day)
-    new = r'/home1/cwecA/OPENDAP/{}/OCMweb{}_new.nc'                .format(day, day)
+    out  = r'/home1/cwecA/OPENDAP/{}/OCMweb{}.nc'                .format(day, day)
     
     mon  = r'/mnt/CWEC2NAS/External_IN/CWB/OCM/NC/{}'.format(day[0:6])
     nas  = r'/mnt/CWEC2NAS/External_IN/CWB/OCM/NC/{}/OCMweb{}.nc'.format(day[0:6], day)
 
-
     # MonthFolder = Path(mon)
     # Path.mkdir(MonthFolder, parents=True, exist_ok=True)
-    if not os.path.isfile(new):
+    if not os.path.isfile(nas):
         if os.path.isfile(U) and os.path.isfile(U):
             # print(U, V, fn)
             subprocess.run(["ncks", "-A", U, fn], stdout=subprocess.PIPE, universal_newlines=True)
@@ -123,11 +131,11 @@ def mergeBYday(day):
             ## ncatted -O -a units,time,o,c,"hours since 2000-01-01 00:00:00" new.nc
             subprocess.call("ncap2 -s 'time=time-1753152' {} {}".format(out, new), shell=True)
             subprocess.call("ncatted -O -a units,time,o,c,'hours since 2000-01-01 00:00:00' {}".format(new), shell=True)
-            
+
             if os.path.isfile(out):
                 if not os.path.isdir(mon):
                     os.mkdir(mon)
-            shutil.copy(new, nas)
+            shutil.copy(out, nas)
             print('[Done] {}'.format(day))
             # if result.stderr != None:
                 # print(result.stdout)
@@ -180,6 +188,35 @@ def BatWrork():
     else:	
         log_write('[ERROR] Check data {}.\n'.format(today_str))
         line_msg('***ERROR***')
+        
+def list_day():
+    work_list = [
+    20210620,
+    20210621,
+    20210622,
+    20210623,
+    20210624,
+    20210625,
+    20210626,
+    20210627,
+    20210628,
+    20210629,
+    20210630,
+    20210631 ]    
+    
+    for day in work_list:  
+        init(str(day))
+        URL = 'https://oceanapi.cwb.gov.tw/opendap/hyrax/OCM/{}/contents.html'.format(day)
+        print(URL)
+        URL_status = requests.get(URL).status_code
+        
+        if URL_status  == 200:
+            BatWrork()
+            mergeBYday(day)
+        else:
+            print('[ERROR] URL not exist, status:{}.'.format(URL_status))
+
+
     
 def one_day():
     
@@ -196,7 +233,7 @@ def one_day():
 
 def backward_main():
 
-    for i in range(0,14):
+    for i in range(0,7):
         today     = datetime.datetime.today()
         deltaday  = datetime.timedelta(days=-i)
         today     = today + deltaday
@@ -224,16 +261,9 @@ def backward_main():
                 # getData_web(types)
                 # time.sleep(sleep_second)    
 
-if __name__ == '__main__':
-    print('\n\n*************************************************************************\n')
+# backward_main()
+list_day()
+print('Script End.\n\n')
 
-    today     = datetime.datetime.today()
-    today_str = datetime.datetime.today().strftime("%Y%m%d")
 
-    # TEST
-    # today_str = '20220125'
-    # print(today_str)
-
-    backward_main()
-    print('Script End.\n\n')
 

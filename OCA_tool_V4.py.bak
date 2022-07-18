@@ -173,7 +173,7 @@ def oil_remain():
 
                 result_string = "其中{}公噸({}%)殘存於海水表面，{}公噸({}%)因海水擾動混入海水中，{}公噸({}%)殘存於岸際，{}公噸({}%)揮發至大氣中".format(Surface,Surface_P, WaterColumn, WaterColumn_P, Ashore, Ashore_P, Evaporated, Evaporated_P)
                 with open(result_path, 'w') as r:
-                    r.write(result_string.place('公噸', oil_unit))
+                    r.write(result_string)
             if float(temp.split(',')[1]) == 0 and counter == 0:
                 time_stamp =  float(temp.split(',')[0])
                 counter = 1         

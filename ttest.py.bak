@@ -1,0 +1,10 @@
+import os, requests
+
+
+url1   = 'http://203.64.168.4/index.html'
+
+
+r    = requests.head(ML_URL)
+code = r.status_code
+if code == 200:   
+    res   = requests.get(url)

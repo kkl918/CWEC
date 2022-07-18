@@ -107,7 +107,7 @@ def mergeBYday(day):
 
     # MonthFolder = Path(mon)
     # Path.mkdir(MonthFolder, parents=True, exist_ok=True)
-    if not os.path.isfile(new):
+    if not os.path.isfile(nas):
         if os.path.isfile(U) and os.path.isfile(U):
             # print(U, V, fn)
             subprocess.run(["ncks", "-A", U, fn], stdout=subprocess.PIPE, universal_newlines=True)

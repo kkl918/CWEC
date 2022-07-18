@@ -553,7 +553,7 @@ def day_check():
     # parse_KH1url_station()
 
     # log(print_detail())
-    line_msg(realtime_status)
+    # line_msg(realtime_status)
 
 
 day_check()

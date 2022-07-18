@@ -209,7 +209,6 @@ def plot_singe_point():
     plt.show()
 
 def check_array_value():
-    lost_array = 0
     init_t   =  datetime.datetime(2000, 1,  1,  0, 0)
     start_t  =  datetime.datetime(2022, 7,  9, 0, 0) + datetime.timedelta(hours=0)
     end_t    =  start_t                              + datetime.timedelta(hours=24)
@@ -231,9 +230,8 @@ def check_array_value():
         time = init_t + datetime.timedelta(hours=rootgrp2.variables['time'][:][i])
         
         if u_all_zeros or v_all_zeros == 1:
-            lost_array += 1
-            # print(i, time)
-    print("LOST:{}/120".format(lost_array))
+            print(i, time)
+
 
 def plot_all():   
     lat = rootgrp2.variables['lat']
